@@ -16,6 +16,9 @@ import java.util.ArrayList;
 public class SpaceWar extends Application {
 
 
+    /**
+     * https://www.youtube.com/watch?v=7Vb9StpxFtw          Part 2
+     */
 
     @Override
     public void start(Stage stage) throws IOException {
@@ -62,11 +65,28 @@ public class SpaceWar extends Application {
 
         //Ship
         Sprite ship = new Sprite("https://i.imgur.com/eKHaPbT.png");
-        ship.pos.set(400, 300);
+        ship.pos.set(100, 300);
 
 
         ArrayList<Sprite> laserList = new ArrayList<Sprite>();
         ArrayList<Sprite> moonList = new ArrayList<Sprite>();
+
+        int asteroidCount = 6;
+        for (int i = 0; i < asteroidCount; i++) {
+            Sprite moon = new Sprite("https://i.imgur.com/M8SOU8I.png");
+            double x = 500 * Math.random() + 300; //300-800
+            double y = 400 * Math.random() + 100; //100-500
+
+            moon.pos.set(x, y);
+
+            double angle = 360 * Math.random();
+            double v = 80 * Math.random() + 20;
+            moon.vel.setLength(v);
+            moon.vel.setAngle(angle);
+
+
+            moonList.add(moon);
+        }
 
 
         AnimationTimer gameLoop = new AnimationTimer() {
@@ -100,13 +120,35 @@ public class SpaceWar extends Application {
                 //clear Key justPressedList
                 keyJustPressedList.clear();
 
+
+                //if moon == hit from laser => BOOM
+                for (int laserNum = 0; laserNum < laserList.size(); laserNum++) {
+                    Sprite laser = laserList.get(laserNum);
+                    for (int moonNum = 0; moonNum < moonList.size(); moonNum++) {
+                        Sprite moon = moonList.get(moonNum);
+                        if (laser.overlaps(moon)) {
+                            //moon = new Sprite("https://i.imgur.com/TrKkWww.jpg");
+
+                            laserList.remove(laserNum);
+                            moonList.remove(moonNum);
+                        }
+
+                    }
+                }
+
                 ship.update(1 / 60.0);
 
+                for (Sprite moon : moonList) {
+                    moon.update(1 / 60.0);
+                }
+
+
+                //update lasers; destroy after 1sec
                 for (int i = 0; i < laserList.size(); i++) {
                     Sprite laser = laserList.get(i);
                     laser.update(1 / 60.0);
 
-                    if (laser.elapsedTime > 1 ) {
+                    if (laser.elapsedTime > 1) {
                         laserList.remove(i);
                     }
                 }
@@ -114,6 +156,12 @@ public class SpaceWar extends Application {
 
                 bg.render(context);
                 ship.render(context);
+                for (Sprite laser : laserList) {
+                    laser.render(context);
+                }
+                for (Sprite moon : moonList) {
+                    moon.render(context);
+                }
                 for (Sprite laser : laserList) {
                     laser.render(context);
                 }
