@@ -9,6 +9,7 @@ public class Sprite {
     public double rot; //deg
     public Rectangle boundary;
     public Image img;
+    public double elapsedTime; //seconds
 
 
     public Sprite() {
@@ -16,6 +17,7 @@ public class Sprite {
         this.vel = new Vector();
         this.rot = 0;
         this.boundary = new Rectangle();
+        this.elapsedTime = 0;
     }
 
     public Sprite(String imgFileName) {
@@ -53,6 +55,7 @@ public class Sprite {
 
         this.wrap(800, 600);
 
+        this.elapsedTime += deltaTime;
 
     }
 

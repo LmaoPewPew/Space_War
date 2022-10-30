@@ -15,10 +15,6 @@ import java.util.ArrayList;
 
 public class SpaceWar extends Application {
 
-    /**
-     * https://www.youtube.com/watch?v=9xsT6Z6HQfw (42:20)  Part 1
-     * https://www.youtube.com/watch?v=7Vb9StpxFtw          Part 1
-     */
 
 
     @Override
@@ -35,18 +31,30 @@ public class SpaceWar extends Application {
         GraphicsContext context = canvas.getGraphicsContext2D();
         root.setCenter(canvas);
 
-        ArrayList<String> keys = new ArrayList<String>();
+        //continues inputs
+        ArrayList<String> keyPressList = new ArrayList<String>();
+        //discrete inputs
+        ArrayList<String> keyJustPressedList = new ArrayList<String>();
 
         scene.setOnKeyPressed((KeyEvent event) -> {
             String keyName = event.getCode().toString();
             //avoid duplicates
-            if (!keys.contains(keyName)) keys.add(keyName);
+            if (!keyPressList.contains(keyName)) {
+
+                keyPressList.add(keyName);
+                keyJustPressedList.add(keyName);
+            }
         });
 
         scene.setOnKeyReleased((KeyEvent event) -> {
             String keyName = event.getCode().toString();
-            if (keys.contains(keyName)) keys.remove(keyName);
+            if (keyPressList.contains(keyName)) {
+
+                keyPressList.remove(keyName);
+                keyJustPressedList.remove(keyName);
+            }
         });
+
 
         //Space
         Sprite bg = new Sprite("https://i.imgur.com/x2kwpXR.jpg");
@@ -56,31 +64,59 @@ public class SpaceWar extends Application {
         Sprite ship = new Sprite("https://i.imgur.com/eKHaPbT.png");
         ship.pos.set(400, 300);
 
-        AnimationTimer gameLoop = new AnimationTimer() {
 
+        ArrayList<Sprite> laserList = new ArrayList<Sprite>();
+        ArrayList<Sprite> moonList = new ArrayList<Sprite>();
+
+
+        AnimationTimer gameLoop = new AnimationTimer() {
 
             @Override
             public void handle(long now) {
 
                 //user input
-                if (keys.contains("LEFT") || keys.contains("A")) ship.rot -= 1.5;
-                if (keys.contains("RIGHT") || keys.contains("D")) ship.rot += 1.5;
+                if (keyPressList.contains("LEFT") || keyPressList.contains("A")) ship.rot -= 1.5;
+                if (keyPressList.contains("RIGHT") || keyPressList.contains("D")) ship.rot += 1.5;
 
-                if (keys.contains("UP") || keys.contains("W")) {
+                if (keyPressList.contains("UP") || keyPressList.contains("W")) {
                     ship.vel.setLength(75);
                     ship.vel.setAngle(ship.rot);
                 } else {
                     ship.vel.setLength(0);
                 }
 
-                //shoot
-                // if (keys.contains("SPA")) ship.rot -= 3;
+                //shooting
+                if (keyJustPressedList.contains("SPACE")) {
+                    Sprite laser = new Sprite("https://i.imgur.com/WgY7t46.png");
+                    laser.pos.set(ship.pos.x, ship.pos.y);
 
+                    laser.vel.setLength(400);
+                    laser.vel.setAngle(ship.rot);
+
+                    laserList.add(laser);
+                }
+
+
+                //clear Key justPressedList
+                keyJustPressedList.clear();
 
                 ship.update(1 / 60.0);
 
+                for (int i = 0; i < laserList.size(); i++) {
+                    Sprite laser = laserList.get(i);
+                    laser.update(1 / 60.0);
+
+                    if (laser.elapsedTime > 1 ) {
+                        laserList.remove(i);
+                    }
+                }
+
+
                 bg.render(context);
                 ship.render(context);
+                for (Sprite laser : laserList) {
+                    laser.render(context);
+                }
 
             }
         };
