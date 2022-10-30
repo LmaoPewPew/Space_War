@@ -36,12 +36,12 @@ public class Vector {
     public void setLength(double L) {
         double currentLength = this.getLength();
 
-        if (currentLength == 0) return;
-
-        this.mul(1 / currentLength);
-
-        this.mul(L);
-
+        if (currentLength == 0) {
+            this.set(L, 0);
+        }else {
+            this.mul(1/currentLength);
+            this.mul(L);
+        }
     }
 
     public double getAngle() {

@@ -38,8 +38,22 @@ public class Sprite {
         return this.getBoundary().overlaps(other.getBoundary());
     }
 
+    public void wrap(double screenWidth, double screenHeight) {
+
+        if (this.pos.x + this.img.getWidth() / 2 < 0) this.pos.x = screenWidth + this.img.getWidth() / 2;
+        if (this.pos.x > screenWidth + this.img.getWidth() / 2) this.pos.x = -this.img.getWidth() / 2;
+
+        if (this.pos.y + this.img.getHeight() / 2 < 0) this.pos.y = screenHeight + this.img.getHeight() / 2;
+        if (this.pos.y > screenHeight + this.img.getHeight() / 2) this.pos.y = -this.img.getHeight() / 2;
+
+    }
+
     public void update(double deltaTime) {
         this.pos.add(this.vel.x * deltaTime, this.vel.y * deltaTime);
+
+        this.wrap(800, 600);
+
+
     }
 
     public void render(GraphicsContext context) {
