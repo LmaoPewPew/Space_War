@@ -8,6 +8,8 @@ import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.image.Image;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.BorderPane;
+import javafx.scene.paint.Color;
+import javafx.scene.text.Font;
 import javafx.stage.Stage;
 
 import java.io.IOException;
@@ -16,9 +18,19 @@ import java.util.ArrayList;
 public class SpaceWar extends Application {
 
 
+
+    //TODO:
     /**
-     * https://www.youtube.com/watch?v=7Vb9StpxFtw          Part 2
+     *  Ship x moon = dead => vel.set(0)
+     *  check Highscore with score => Text: Best Score (Math.max(highscore,score);
+     *  esc => title menu => vel.set(0)
+     *  -> 2 Buttons:
+     *      resumeBtn, ExitBtn
      */
+
+    int score;
+    int highscore;
+
 
     @Override
     public void start(Stage stage) throws IOException {
@@ -88,7 +100,7 @@ public class SpaceWar extends Application {
             moonList.add(moon);
         }
 
-
+        score = 0;
         AnimationTimer gameLoop = new AnimationTimer() {
 
             @Override
@@ -131,17 +143,19 @@ public class SpaceWar extends Application {
 
                             laserList.remove(laserNum);
                             moonList.remove(moonNum);
+                            score += 50;
                         }
 
                     }
                 }
 
-                ship.update(1 / 60.0);
 
+                //UPDATE
+
+                ship.update(1 / 60.0);
                 for (Sprite moon : moonList) {
                     moon.update(1 / 60.0);
                 }
-
 
                 //update lasers; destroy after 1sec
                 for (int i = 0; i < laserList.size(); i++) {
@@ -153,6 +167,7 @@ public class SpaceWar extends Application {
                     }
                 }
 
+                //RENDER
 
                 bg.render(context);
                 ship.render(context);
@@ -165,6 +180,19 @@ public class SpaceWar extends Application {
                 for (Sprite laser : laserList) {
                     laser.render(context);
                 }
+
+                //Draw Score on Screen
+                context.setFill(Color.WHITE);
+                context.setStroke(Color.TEAL);
+                context.setFont(new Font("Arial Black", 36));
+                context.setLineWidth(3);
+
+                String txt = "Score: " + score;
+                int txtX = 10;
+                int txtY = 50;
+
+                context.fillText(txt, txtX, txtY);
+                context.strokeText(txt, txtX, txtY);
 
             }
         };
