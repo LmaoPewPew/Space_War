@@ -50,10 +50,10 @@ public class Sprite {
 
     }
 
-    public void update(double deltaTime) {
+    public void update(double deltaTime, int w, int h) {
         this.pos.add(this.vel.x * deltaTime, this.vel.y * deltaTime);
 
-        this.wrap(800, 600);
+        this.wrap(w-10, h+10);
 
         this.elapsedTime += deltaTime;
 
