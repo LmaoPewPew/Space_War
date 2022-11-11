@@ -22,7 +22,7 @@ import java.util.List;
 
 public class SpaceWar extends Application {
     /**
-     * asteroids are labeled as moons, because I think its funny to use a moon image as an asteroid.
+     * asteroids are labeled as moons, because I think its funny to use a moon image as an asteroid. moons == asteroids!
      * Sprite images couldn't load properly, that's why I'll use an online source via Imgur
      */
 
@@ -55,7 +55,7 @@ public class SpaceWar extends Application {
 
     private final int winWidth = 1000, winHeights = 660;
     private final double deltaTime = 1 / 60.0;
-    
+
     //MainMenu
     private List<Pair<String, Runnable>> menuData = Arrays.asList(new Pair<String, Runnable>("Resume to Game", () -> {
     }), new Pair<String, Runnable>("Exit to Desktop", Platform::exit));
@@ -93,8 +93,8 @@ public class SpaceWar extends Application {
         ArrayList<Sprite> laserList = new ArrayList<Sprite>();
         ArrayList<Sprite> moonList = new ArrayList<Sprite>();
 
-
         isKeyPressed(scene, keyPressList, keyJustPressedList);
+
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         //Generate Sprites
 
@@ -124,10 +124,8 @@ public class SpaceWar extends Application {
                 if (score == 500) asteroidSpawnCount = 7;
                 if (score == 1000) asteroidSpawnCount = 12;
 
-                System.out.println(asteroidCounter + " | " + asteroidSpawnCount);
-                // spawn wanted asteroids
-                if (asteroidCounter < asteroidSpawnCount)
-                    spawnAsteroids(ship, moonList);
+                // spawn wanted amound of asteroids
+                if (asteroidCounter < asteroidSpawnCount) spawnAsteroids(ship, moonList);
 
                 /***************************************************************************************************/
 
@@ -194,8 +192,7 @@ public class SpaceWar extends Application {
     }
 
     private void spawnAsteroids(Sprite ship, ArrayList<Sprite> moonList) {
-        if (asteroidCounter <= asteroidSpawnCount)
-            asteroidCounter++;
+        if (asteroidCounter <= asteroidSpawnCount) asteroidCounter++;
 
         //Making asteroids not spawn on the ship!
         double shipX = ship.pos.x;
@@ -210,13 +207,33 @@ public class SpaceWar extends Application {
         moon.pos.set(x, y);
 
         double angle = 360 * Math.random();
-        double v = 80 * Math.random() + 10;
+        double v = asteroidsSpeed();
 
         moon.vel.setLength(v);
         moon.vel.setAngle(angle);
 
         moonList.add(moon);
+    }
 
+    //changes asteroids spawn rate and asteroids speed;
+    private double asteroidsSpeed() {
+        double speed = 20 * Math.random() + 5;
+
+
+        if (score >= 200) {
+            speed = 40 * Math.random() + speed;
+        } else if (score >= 500) {
+            speed = 80 * Math.random() + speed;
+        } else if (score >= 1000) {
+            speed = 100 * Math.random() + speed;
+        }
+
+        speed = Math.floor(speed);
+        if (asteroidCounter == asteroidSpawnCount)
+            System.out.println("Speed: " + speed + "  |  Spawned num: " + asteroidCounter);
+        System.out.println("-------------");
+
+        return speed;
     }
 
     private void playerMov(ArrayList<String> keyPressList, Sprite ship) {
@@ -253,7 +270,7 @@ public class SpaceWar extends Application {
                 if (laser.overlaps(moon)) {
                     laserList.remove(laserNum);
                     moonList.remove(moonNum);
-                    score += 50;
+                    score += 100;
                     asteroidCounter--;
                 }
 
