@@ -21,6 +21,11 @@ import java.util.Arrays;
 import java.util.List;
 
 public class SpaceWar extends Application {
+    /**
+     * asteroids are labeled as moons, because I think its funny to use a moon image as an asteroid.
+     * Sprite images couldn't load properly, that's why I'll use an online source via Imgur
+     */
+
 
     /**
      * SOURCES:
@@ -28,35 +33,38 @@ public class SpaceWar extends Application {
      * https://www.google.com/search?q=javafx+game+main+menu&client=opera&ei=f3pqY8-tL6aCxc8P8-ufqAg&oq=javafx+game+main&gs_lcp=Cgxnd3Mtd2l6LXNlcnAQAxgAMgUIIRCgAToKCAAQRxDWBBCwAzoFCAAQogQ6BQgAEIAEOgYIABAWEB46BAghEBVKBAhBGABKBAhGGABQtRFY5SxgmDZoAXABeACAAZQBiAHgB5IBAzQuNZgBAKABAcgBCMABAQ&sclient=gws-wiz-serp
      * https://www.google.com/search?q=javafx+objectproperty&client=opera&hs=cnU&ei=zXhqY8GpHfq8xc8PyZ240AU&oq=javaFX+respawn+object&gs_lcp=Cgxnd3Mtd2l6LXNlcnAQARgAMggIABCiBBCwAzIICAAQogQQsANKBAhBGAFKBAhGGABQAFgAYIw1aAFwAHgAgAEAiAEAkgEAmAEAyAECwAEB&sclient=gws-wiz-serp
      * https://www.baeldung.com/javafx-button-eventhandler
-     *
      */
 
-    //TODO:
     /**
+     * TODO:
      * moons not spawn near Ship
      * Ship x moon = dead => vel.set(0)
      * check High-score with score => Text: Best Score (Math.max(high-score,score);
-     * esc => title menu => vel.set(0)
-     * -> 2 Buttons:
-     * -> resumeBtn / press ESC again: start game.
-     * ExitBtn: close Game.
-     * respawn moons
+     * Moon increases:
+     * => <200 pts: 5 moons | speed: 50
+     * => <500: 7 moons |sp 75
+     * => <1000: 12 moons | sp 125
      * timer
+     * ----
+     * esc => title menu => vel.set(0)
+     * --> 2 Buttons:
+     * ----> resumeBtn / press ESC again: start game.
+     * ExitBtn: close Game.
      */
 
 
-    private final int winWidth = 1000;
-    private final int winHeights = 660;
+    private final int winWidth = 1000, winHeights = 660;
     private final double deltaTime = 1 / 60.0;
-
+    
+    //MainMenu
     private List<Pair<String, Runnable>> menuData = Arrays.asList(new Pair<String, Runnable>("Resume to Game", () -> {
     }), new Pair<String, Runnable>("Exit to Desktop", Platform::exit));
 
 
-    int asteroidCount = 7;
-    boolean isGamePaused = false;
-    int score;
-    int highscore;
+    int asteroidCounter, asteroidSpawnCount = 3;
+
+    boolean isGamePaused = false, gameOver = false;
+    int score = 0, highscore;
 
 
     @Override
@@ -70,7 +78,6 @@ public class SpaceWar extends Application {
         stage.setScene(scene);
         stage.setResizable(false);
         stage.initStyle(StageStyle.UTILITY);
-//        stage.initStyle(StageStyle.UNDECORATED);
 
 
         //ArrayList
@@ -95,19 +102,11 @@ public class SpaceWar extends Application {
         Sprite bg = new Sprite("https://i.imgur.com/x2kwpXR.jpg");
         bg.pos.set(winWidth / 2, winHeights / 2);
 
-
         //Ship
         Sprite ship = new Sprite("https://i.imgur.com/eKHaPbT.png");
         ship.pos.set(winWidth / 2, winHeights / 2);
 
-
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-        //Asteroids Spawn
-
-        spawnAsteroids(ship, moonList);
-
         /**+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
-
         //event handler
         score = 0;
         AnimationTimer gameLoop = new AnimationTimer() {
@@ -120,6 +119,16 @@ public class SpaceWar extends Application {
                 //shooting
                 playerShoot(keyJustPressedList, ship, laserList);
 
+                //difficulty change:
+                if (score == 200) asteroidSpawnCount = 5;
+                if (score == 500) asteroidSpawnCount = 7;
+                if (score == 1000) asteroidSpawnCount = 12;
+
+                System.out.println(asteroidCounter + " | " + asteroidSpawnCount);
+                // spawn wanted asteroids
+                if (asteroidCounter < asteroidSpawnCount)
+                    spawnAsteroids(ship, moonList);
+
                 /***************************************************************************************************/
 
                 //Pause=> MainMenu();
@@ -128,22 +137,16 @@ public class SpaceWar extends Application {
                     if (isGamePaused == false) {
                         isGamePaused = true;
                         //initMainMenu(stage);
-
                     } else {
                         isGamePaused = false;
-                    }
-
-                     */
+                    }*/
 
                     addTitle("SpaceWars");
-
-
                 }
 
 
                 //clear Key justPressedList
                 keyJustPressedList.clear();
-
 
                 moonHit(laserList, moonList);
 
@@ -156,10 +159,8 @@ public class SpaceWar extends Application {
             }
         };
 
-/////////////////////////////////////
+////////////////////////////////////////////////////
         //end of launch()
-
-
         gameLoop.start();
         stage.show();
     }
@@ -172,6 +173,7 @@ public class SpaceWar extends Application {
         //isKeyPressed
         scene.setOnKeyPressed((KeyEvent event) -> {
             String keyName = event.getCode().toString();
+
             //avoid duplicates
             if (!keyPressList.contains(keyName)) {
 
@@ -192,30 +194,29 @@ public class SpaceWar extends Application {
     }
 
     private void spawnAsteroids(Sprite ship, ArrayList<Sprite> moonList) {
-        //while (asteroidCount >= 7) {
-        for (int i = 0; i < asteroidCount; i++) {
-            double shipX = ship.pos.x;
-            double shipY = ship.pos.y;
+        if (asteroidCounter <= asteroidSpawnCount)
+            asteroidCounter++;
 
-            Sprite moon = new Sprite("https://i.imgur.com/M8SOU8I.png");
-            double x = winWidth / 2 * Math.random();
-            double y = winHeights / 2 * Math.random();
+        //Making asteroids not spawn on the ship!
+        double shipX = ship.pos.x;
+        double shipY = ship.pos.y;
 
-            if (x <= shipX + 50 || x >= shipX - 50) x += 100;
+        Sprite moon = new Sprite("https://i.imgur.com/M8SOU8I.png");
 
-            if (y <= shipY + 50 || y >= shipY - 50) y += 100;
+        double x = winWidth / 2 * Math.random();
+        double y = winHeights / 2 * Math.random();
 
+//        if
+        moon.pos.set(x, y);
 
-            moon.pos.set(x, y);
+        double angle = 360 * Math.random();
+        double v = 80 * Math.random() + 10;
 
-            double angle = 360 * Math.random();
-            double v = 80 * Math.random() + 20;
-            moon.vel.setLength(v);
-            moon.vel.setAngle(angle);
+        moon.vel.setLength(v);
+        moon.vel.setAngle(angle);
 
-            moonList.add(moon);
-        }
-        //       }
+        moonList.add(moon);
+
     }
 
     private void playerMov(ArrayList<String> keyPressList, Sprite ship) {
@@ -253,7 +254,7 @@ public class SpaceWar extends Application {
                     laserList.remove(laserNum);
                     moonList.remove(moonNum);
                     score += 50;
-                    asteroidCount--;
+                    asteroidCounter--;
                 }
 
             }
@@ -309,6 +310,22 @@ public class SpaceWar extends Application {
         context.strokeText(txt, txtX, txtY);
     }
 
+
+    private void drawHighscore(GraphicsContext context) {
+        context.setFill(Color.WHITE);
+        context.setStroke(Color.TEAL);
+        context.setFont(new Font("Arial Black", 50));
+        context.setLineWidth(3);
+
+        String txt = "HighScore: " + highscore;
+        int txtX = winWidth / 2;
+        int txtY = winHeights / 2;
+
+        context.fillText(txt, txtX, txtY);
+        context.strokeText(txt, txtX, txtY);
+
+    }
+
     private void addTitle(String name) {
         SpaceWarsTitle swTitle = new SpaceWarsTitle(name);
         swTitle.setTranslateX(winWidth / 2 - swTitle.getTitleWidth() / 2);
@@ -317,7 +334,7 @@ public class SpaceWar extends Application {
 
     /**
      * protected void initMainMenu(Stage mainMenuRoot) {
-     * Rectangle background = new Rectangle(winWidth, winHeights);
+     * Boundary background = new Boundary(winWidth, winHeights);
      * Font font = Font.font(72);
      * //
      * Button btnStart = new Button("Resume");

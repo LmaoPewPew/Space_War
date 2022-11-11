@@ -7,7 +7,7 @@ public class Sprite {
     public Vector pos;
     public Vector vel; //velocity
     public double rot; //deg
-    public Rectangle boundary;
+    public Boundary boundary;
     public Image img;
     public double elapsedTime; //seconds
 
@@ -16,7 +16,7 @@ public class Sprite {
         this.pos = new Vector();
         this.vel = new Vector();
         this.rot = 0;
-        this.boundary = new Rectangle();
+        this.boundary = new Boundary();
         this.elapsedTime = 0;
     }
 
@@ -31,7 +31,7 @@ public class Sprite {
     }
 
 
-    public Rectangle getBoundary() {
+    public Boundary getBoundary() {
         this.boundary.setPos(this.pos.x, this.pos.y);
         return this.boundary;
     }

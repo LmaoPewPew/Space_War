@@ -1,18 +1,18 @@
 package sn.thu.space_war;
 
-public class Rectangle {
+public class Boundary {
     double x;
     double y;
     double width;
     double height;
 
-    public Rectangle() {
+    public Boundary() {
         this.setPos(0, 0);
         this.setSize(1, 1);
 
     }
 
-    public Rectangle(double x, double y, double w, double h) {
+    public Boundary(double x, double y, double w, double h) {
         this.setPos(x, y);
         this.setSize(w, h);
 
@@ -29,7 +29,7 @@ public class Rectangle {
         this.width = w;
     }
 
-    public boolean overlaps(Rectangle other) {
+    public boolean overlaps(Boundary other) {
 
         boolean noOverlap = this.x + this.width < other.x || other.x + other.width < this.x || this.y + this.height < other.y || other.y + other.height < this.y;
 
