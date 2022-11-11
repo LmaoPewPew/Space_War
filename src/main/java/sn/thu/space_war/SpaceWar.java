@@ -2,7 +2,6 @@ package sn.thu.space_war;
 
 import javafx.animation.AnimationTimer;
 import javafx.application.Application;
-import javafx.application.Platform;
 import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
@@ -13,20 +12,18 @@ import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
-import javafx.util.Pair;
 
 import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 
 public class SpaceWar extends Application {
     /**
      * asteroids are labeled as moons, because I think its funny to use a moon image as an asteroid. moons == asteroids!
      * Sprite images couldn't load properly, that's why I'll use an online source via Imgur
      */
+    //Test
 
 
     /**
@@ -138,7 +135,7 @@ public class SpaceWar extends Application {
                 /***************************************************************************************************/
 
                 //Pause=> MainMenu();
-                addTitle("SpaceWars");
+                addTitle();
 
 
 ///////////////////////////////////////////////////////////////////
@@ -269,9 +266,9 @@ public class SpaceWar extends Application {
     private void mainMenu(ArrayList<String> keyJustPressedList) {
 
         if (keyJustPressedList.contains("ESCAPE")) {
-            if (isGamePaused == false) {
+            if (!isGamePaused) {
                 isGamePaused = true;
-                //initMainMenu(stage);
+                System.out.println("is the game paused? " + isGamePaused);
             } else {
                 isGamePaused = false;
             }
@@ -297,8 +294,7 @@ public class SpaceWar extends Application {
 
     private void collisionDetection(Sprite ship, ArrayList<Sprite> moonList) {
 
-        for (int moonNum = 0; moonNum < moonList.size(); moonNum++) {
-            Sprite moon = moonList.get(moonNum);
+        for (Sprite moon : moonList) {
             if (ship.overlaps(moon)) {
                 gameOver = true;
 
@@ -393,8 +389,8 @@ public class SpaceWar extends Application {
 
     }
 
-    private void addTitle(String name) {
-        SpaceWarsTitle swTitle = new SpaceWarsTitle(name);
+    private void addTitle() {
+        SpaceWarsTitle swTitle = new SpaceWarsTitle("SpaceWars");
         swTitle.setTranslateX(winWidth / 2 - swTitle.getTitleWidth() / 2);
         swTitle.setTranslateY(winHeights / 2);
     }
