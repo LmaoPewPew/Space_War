@@ -15,6 +15,8 @@ import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 import javafx.util.Pair;
 
+import java.io.BufferedWriter;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -54,21 +56,23 @@ public class SpaceWar extends Application {
 
 
     private final int winWidth = 1000, winHeights = 660;
-    private final double deltaTime = 1 / 60.0;
 
-    //MainMenu
+    /*
+   MainMenu
     private List<Pair<String, Runnable>> menuData = Arrays.asList(new Pair<String, Runnable>("Resume to Game", () -> {
-    }), new Pair<String, Runnable>("Exit to Desktop", Platform::exit));
+   }), new Pair<String, Runnable>("Exit to Desktop", Platform::exit));
+   */
 
 
     int asteroidCounter, asteroidSpawnCount = 3;
 
     boolean isGamePaused = false, gameOver = false;
-    int score = 0, highscore;
+    int score = 0;
+    String highscore;
 
 
     @Override
-    public void start(Stage stage) throws IOException {
+    public void start(Stage stage) {
 
         stage.getIcons().add(new Image("https://i.imgur.com/DkhjfKu.png"));
         stage.setTitle("SpaceWars!");
@@ -86,12 +90,12 @@ public class SpaceWar extends Application {
         root.setCenter(canvas);
 
         //continues inputs
-        ArrayList<String> keyPressList = new ArrayList<String>();
+        ArrayList<String> keyPressList = new ArrayList<>();
         //discrete inputs
-        ArrayList<String> keyJustPressedList = new ArrayList<String>();
+        ArrayList<String> keyJustPressedList = new ArrayList<>();
 
-        ArrayList<Sprite> laserList = new ArrayList<Sprite>();
-        ArrayList<Sprite> moonList = new ArrayList<Sprite>();
+        ArrayList<Sprite> laserList = new ArrayList<>();
+        ArrayList<Sprite> moonList = new ArrayList<>();
 
         isKeyPressed(scene, keyPressList, keyJustPressedList);
 
@@ -119,13 +123,14 @@ public class SpaceWar extends Application {
                 //shooting
                 playerShoot(keyJustPressedList, ship, laserList);
 
-                /*
+                //mainMenu(keyJustPressedList);
+
+
                 //difficulty change:
                 if (score == 200) asteroidSpawnCount = 5;
                 if (score == 500) asteroidSpawnCount = 7;
                 if (score == 1000) asteroidSpawnCount = 12;
-                */
-                asteroidSpawnCount = 25;
+
 
                 // spawn wanted amound of asteroids
                 if (asteroidCounter < asteroidSpawnCount) spawnAsteroids(ship, moonList);
@@ -133,32 +138,24 @@ public class SpaceWar extends Application {
                 /***************************************************************************************************/
 
                 //Pause=> MainMenu();
-                if (keyJustPressedList.contains("ESCAPE")) {
-                    /*
-                    if (isGamePaused == false) {
-                        isGamePaused = true;
-                        //initMainMenu(stage);
-                    } else {
-                        isGamePaused = false;
-                    }*/
-
-                    addTitle("SpaceWars");
-                }
+                addTitle("SpaceWars");
 
 
+///////////////////////////////////////////////////////////////////
                 //clear Key justPressedList
                 keyJustPressedList.clear();
 
                 moonHit(laserList, moonList);
+                //collisionDetection(ship, moonList);
 
                 updateGraphics(ship, laserList, moonList);
                 renderGraphics(context, bg, ship, laserList, moonList);
 
                 drawScore(context);
+                //drawHighscore(context);
             }
         };
-
-////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////
         //end of launch()
         gameLoop.start();
         stage.show();
@@ -197,14 +194,16 @@ public class SpaceWar extends Application {
         Sprite moon = new Sprite("https://i.imgur.com/M8SOU8I.png");
 
         // moon position
-        double x = winWidth / 2 * Math.random();
-        double y = winHeights / 2 * Math.random();
+        double x = winWidth * Math.random();
+        double y = winHeights * Math.random();
 
         moon.pos.set(spawnBubble(x, shipX), spawnBubble(y, shipY));
 
+        //moon.pos.set(x, y);
+
         double angle = 360 * Math.random();
         double v = asteroidsSpeed();
-        v = 0;
+        //v = 0;
 
         moon.vel.setLength(v);
         moon.vel.setAngle(angle);
@@ -215,11 +214,11 @@ public class SpaceWar extends Application {
 
     //TODO: ALL MOONS SPAWN IN A SINGLE CORNER!!
     private double spawnBubble(double pos, double sPos) {
-        //alternation
+
         final int pow = (int) (Math.random() * 2) + 1;
         final int alt = (int) Math.pow((-1), pow);
 
-        if (sPos + 50 >= pos || sPos - 50 <= pos) pos += (sPos + 50) * alt;
+        if (sPos + 50 >= pos || sPos - 50 <= pos) pos += sPos * alt;
 
         //out of bounds spawn
         if (pos <= 0) pos = winWidth - 100;
@@ -233,7 +232,6 @@ public class SpaceWar extends Application {
     private double asteroidsSpeed() {
         double speed = 20 * Math.random() + 5;
 
-
         if (score >= 200) {
             speed = 40 * Math.random() + speed;
         } else if (score >= 500) {
@@ -243,10 +241,6 @@ public class SpaceWar extends Application {
         }
 
         speed = Math.floor(speed);
-        if (asteroidCounter == asteroidSpawnCount)
-            System.out.println("Speed: " + speed + "  |  Spawned num: " + asteroidCounter);
-        System.out.println("-------------");
-
         return speed;
     }
 
@@ -266,11 +260,21 @@ public class SpaceWar extends Application {
         if (keyJustPressedList.contains("SPACE")) {
             Sprite laser = new Sprite("https://i.imgur.com/WgY7t46.png");
             laser.pos.set(ship.pos.x, ship.pos.y);
-
             laser.vel.setLength(400);
             laser.vel.setAngle(ship.rot);
-
             laserList.add(laser);
+        }
+    }
+
+    private void mainMenu(ArrayList<String> keyJustPressedList) {
+
+        if (keyJustPressedList.contains("ESCAPE")) {
+            if (isGamePaused == false) {
+                isGamePaused = true;
+                //initMainMenu(stage);
+            } else {
+                isGamePaused = false;
+            }
         }
     }
 
@@ -287,12 +291,44 @@ public class SpaceWar extends Application {
                     score += 100;
                     asteroidCounter--;
                 }
+            }
+        }
+    }
 
+    private void collisionDetection(Sprite ship, ArrayList<Sprite> moonList) {
+
+        for (int moonNum = 0; moonNum < moonList.size(); moonNum++) {
+            Sprite moon = moonList.get(moonNum);
+            if (ship.overlaps(moon)) {
+                gameOver = true;
+
+                ship.vel.setLength(0);
+                moon.vel.setLength(0);
+
+
+                //setHighscore();
+                System.out.println(highscore);
+            }
+        }
+    }
+
+    private void setHighscore() {
+
+        if (score > Integer.parseInt(highscore)) {
+            highscore = String.valueOf(score);
+            try {
+                FileWriter writer = new FileWriter("sn/thu/space_war/highscore.txt", false);
+                BufferedWriter bufferedWriter = new BufferedWriter(writer);
+                bufferedWriter.write(highscore);
+                bufferedWriter.close();
+            } catch (IOException e) {
+                e.printStackTrace();
             }
         }
     }
 
     private void updateGraphics(Sprite ship, ArrayList<Sprite> laserList, ArrayList<Sprite> moonList) {
+        double deltaTime = 1 / 60.0;
 
         ship.update(deltaTime, winWidth, winHeights);
         for (Sprite moon : moonList) {
