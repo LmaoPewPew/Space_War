@@ -119,10 +119,13 @@ public class SpaceWar extends Application {
                 //shooting
                 playerShoot(keyJustPressedList, ship, laserList);
 
+                /*
                 //difficulty change:
                 if (score == 200) asteroidSpawnCount = 5;
                 if (score == 500) asteroidSpawnCount = 7;
                 if (score == 1000) asteroidSpawnCount = 12;
+                */
+                asteroidSpawnCount = 25;
 
                 // spawn wanted amound of asteroids
                 if (asteroidCounter < asteroidSpawnCount) spawnAsteroids(ship, moonList);
@@ -151,9 +154,7 @@ public class SpaceWar extends Application {
                 updateGraphics(ship, laserList, moonList);
                 renderGraphics(context, bg, ship, laserList, moonList);
 
-
                 drawScore(context);
-
             }
         };
 
@@ -167,14 +168,11 @@ public class SpaceWar extends Application {
      * ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++METHODS STARTING+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
      */
     private void isKeyPressed(Scene scene, ArrayList<String> keyPressList, ArrayList<String> keyJustPressedList) {
-
         //isKeyPressed
         scene.setOnKeyPressed((KeyEvent event) -> {
             String keyName = event.getCode().toString();
-
             //avoid duplicates
             if (!keyPressList.contains(keyName)) {
-
                 keyPressList.add(keyName);
                 keyJustPressedList.add(keyName);
             }
@@ -183,37 +181,53 @@ public class SpaceWar extends Application {
         scene.setOnKeyReleased((KeyEvent event) -> {
             String keyName = event.getCode().toString();
             if (keyPressList.contains(keyName)) {
-
                 keyPressList.remove(keyName);
                 keyJustPressedList.remove(keyName);
             }
         });
-
     }
 
     private void spawnAsteroids(Sprite ship, ArrayList<Sprite> moonList) {
-        if (asteroidCounter <= asteroidSpawnCount) asteroidCounter++;
-
         //Making asteroids not spawn on the ship!
+        //declare ship pos and 50 radius "anti-spawn bubble"
         double shipX = ship.pos.x;
         double shipY = ship.pos.y;
 
+        if (asteroidCounter <= asteroidSpawnCount) asteroidCounter++;
         Sprite moon = new Sprite("https://i.imgur.com/M8SOU8I.png");
 
+        // moon position
         double x = winWidth / 2 * Math.random();
         double y = winHeights / 2 * Math.random();
 
-//        if
-        moon.pos.set(x, y);
+        moon.pos.set(spawnBubble(x, shipX), spawnBubble(y, shipY));
 
         double angle = 360 * Math.random();
         double v = asteroidsSpeed();
+        v = 0;
 
         moon.vel.setLength(v);
         moon.vel.setAngle(angle);
 
         moonList.add(moon);
     }
+
+
+    //TODO: ALL MOONS SPAWN IN A SINGLE CORNER!!
+    private double spawnBubble(double pos, double sPos) {
+        //alternation
+        final int pow = (int) (Math.random() * 2) + 1;
+        final int alt = (int) Math.pow((-1), pow);
+
+        if (sPos + 50 >= pos || sPos - 50 <= pos) pos += (sPos + 50) * alt;
+
+        //out of bounds spawn
+        if (pos <= 0) pos = winWidth - 100;
+        if (pos >= winWidth) pos = 100;
+
+        return pos;
+    }
+
 
     //changes asteroids spawn rate and asteroids speed;
     private double asteroidsSpeed() {
