@@ -23,7 +23,6 @@ public class SpaceWar extends Application {
      * asteroids are labeled as moons, because I think its funny to use a moon image as an asteroid. moons == asteroids!
      * Sprite images couldn't load properly, that's why I'll use an online source via Imgur
      */
-    //Test
 
 
     /**
@@ -36,14 +35,10 @@ public class SpaceWar extends Application {
 
     /**
      * TODO:
-     * moons not spawn near Ship
-     * Ship x moon = dead => vel.set(0)
-     * check High-score with score => Text: Best Score (Math.max(high-score,score);
-     * Moon increases:
-     * => <200 pts: 5 moons | speed: 50
-     * => <500: 7 moons |sp 75
-     * => <1000: 12 moons | sp 125
-     * timer
+     * moons not spawn near Ship            | on-Hold
+     * Ship x moon = dead => vel.set(0)     | doing now
+     * check High-score with score          | planned next: siehe flappy bird project
+     * => Text: Best Score (Math.max(high-score,score);
      * ----
      * esc => title menu => vel.set(0)
      * --> 2 Buttons:
@@ -143,7 +138,7 @@ public class SpaceWar extends Application {
                 keyJustPressedList.clear();
 
                 moonHit(laserList, moonList);
-                //collisionDetection(ship, moonList);
+                collisionDetection(ship, moonList);
 
                 updateGraphics(ship, laserList, moonList);
                 renderGraphics(context, bg, ship, laserList, moonList);
@@ -292,6 +287,8 @@ public class SpaceWar extends Application {
         }
     }
 
+
+    //TODO: moon collision!
     private void collisionDetection(Sprite ship, ArrayList<Sprite> moonList) {
 
         for (Sprite moon : moonList) {
@@ -308,6 +305,7 @@ public class SpaceWar extends Application {
         }
     }
 
+    //TODO
     private void setHighscore() {
 
         if (score > Integer.parseInt(highscore)) {
