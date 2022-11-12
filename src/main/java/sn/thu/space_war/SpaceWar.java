@@ -13,9 +13,6 @@ import javafx.scene.text.Font;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 
-import java.io.BufferedWriter;
-import java.io.FileWriter;
-import java.io.IOException;
 import java.util.ArrayList;
 
 public class SpaceWar extends Application {
@@ -36,8 +33,9 @@ public class SpaceWar extends Application {
     /**
      * TODO:
      * moons not spawn near Ship            | on-Hold
-     * Ship x moon = dead => vel.set(0)     | doing now
      * check High-score with score          | planned next: siehe flappy bird project
+     * <p>
+     * endCart: => show highscore, play again button
      * => Text: Best Score (Math.max(high-score,score);
      * ----
      * esc => title menu => vel.set(0)
@@ -110,30 +108,21 @@ public class SpaceWar extends Application {
             @Override
             public void handle(long now) {
 
-                //user input
-                playerMov(keyPressList, ship);
-                //shooting
-                playerShoot(keyJustPressedList, ship, laserList);
-
-                //mainMenu(keyJustPressedList);
+                if (!gameOver) {
+                    //user input
+                    playerMov(keyPressList, ship);
+                    playerShoot(keyJustPressedList, ship, laserList);
+                    mainMenu(keyJustPressedList);
+                }
 
 
                 //difficulty change:
                 if (score == 200) asteroidSpawnCount = 5;
                 if (score == 500) asteroidSpawnCount = 7;
                 if (score == 1000) asteroidSpawnCount = 12;
-
-
-                // spawn wanted amound of asteroids
                 if (asteroidCounter < asteroidSpawnCount) spawnAsteroids(ship, moonList);
 
                 /***************************************************************************************************/
-
-                //Pause=> MainMenu();
-                addTitle();
-
-
-///////////////////////////////////////////////////////////////////
                 //clear Key justPressedList
                 keyJustPressedList.clear();
 
@@ -144,7 +133,9 @@ public class SpaceWar extends Application {
                 renderGraphics(context, bg, ship, laserList, moonList);
 
                 drawScore(context);
-                //drawHighscore(context);
+                if (gameOver) {
+                    drawDeathScreen(context);
+                }
             }
         };
 ///////////////////////////////////////////////////////////////////
@@ -224,13 +215,9 @@ public class SpaceWar extends Application {
     private double asteroidsSpeed() {
         double speed = 20 * Math.random() + 5;
 
-        if (score >= 200) {
-            speed = 40 * Math.random() + speed;
-        } else if (score >= 500) {
-            speed = 80 * Math.random() + speed;
-        } else if (score >= 1000) {
-            speed = 100 * Math.random() + speed;
-        }
+        if (score >= 200) speed = 40 * Math.random() + speed;
+        if (score >= 500) speed = 80 * Math.random() + speed;
+        if (score >= 1000) speed = 100 * Math.random() + speed;
 
         speed = Math.floor(speed);
         return speed;
@@ -259,12 +246,16 @@ public class SpaceWar extends Application {
     }
 
     private void mainMenu(ArrayList<String> keyJustPressedList) {
-
         if (keyJustPressedList.contains("ESCAPE")) {
             if (!isGamePaused) {
-                isGamePaused = true;
+                addTitle();
+
                 System.out.println("is the game paused? " + isGamePaused);
+
+                isGamePaused = true;
             } else {
+
+
                 isGamePaused = false;
             }
         }
@@ -294,22 +285,37 @@ public class SpaceWar extends Application {
         for (Sprite moon : moonList) {
             if (ship.overlaps(moon)) {
                 gameOver = true;
-
                 ship.vel.setLength(0);
                 moon.vel.setLength(0);
 
-
-                //setHighscore();
-                System.out.println(highscore);
+                setHighscore();
+                getEndCart();
             }
         }
     }
 
     //TODO
     private void setHighscore() {
+        /*
 
+
+        try {
+            File hsFile = new File("sn/thu/space_war/highscore.txt");
+            Scanner myReader = new Scanner(hsFile);
+
+            while (myReader.hasNextLine()) {
+                String data = myReader.nextLine();
+                System.out.println(data);
+            }
+            myReader.close();
+        } catch (FileNotFoundException e) {
+            System.out.println("An error occurred.");
+            e.printStackTrace();
+        }
+        /*
         if (score > Integer.parseInt(highscore)) {
             highscore = String.valueOf(score);
+
             try {
                 FileWriter writer = new FileWriter("sn/thu/space_war/highscore.txt", false);
                 BufferedWriter bufferedWriter = new BufferedWriter(writer);
@@ -319,7 +325,13 @@ public class SpaceWar extends Application {
                 e.printStackTrace();
             }
         }
+
+         */
     }
+
+    private void getEndCart() {
+    }
+
 
     private void updateGraphics(Sprite ship, ArrayList<Sprite> laserList, ArrayList<Sprite> moonList) {
         double deltaTime = 1 / 60.0;
@@ -355,35 +367,43 @@ public class SpaceWar extends Application {
         }
     }
 
-    //Draw Score on Screen
-    private void drawScore(GraphicsContext context) {
-
-        context.setFill(Color.WHITE);
-        context.setStroke(Color.TEAL);
-        context.setFont(new Font("Arial Black", 36));
+    private void setText(GraphicsContext context, String txt, int size, int txtX, int txtY, Color fill) {
+        context.setFill(fill);
+        context.setStroke(Color.BLACK);
+        context.setFont(new Font("Arial Black", size));
         context.setLineWidth(3);
-
-        String txt = "Score: " + score;
-        int txtX = 10;
-        int txtY = 50;
-
         context.fillText(txt, txtX, txtY);
         context.strokeText(txt, txtX, txtY);
     }
 
 
-    private void drawHighscore(GraphicsContext context) {
-        context.setFill(Color.WHITE);
-        context.setStroke(Color.TEAL);
-        context.setFont(new Font("Arial Black", 50));
-        context.setLineWidth(3);
+    //Draw Score on Screen
+    private void drawScore(GraphicsContext context) {
+        String txt = "Score: " + score;
+        int txtX, txtY;
 
-        String txt = "HighScore: " + highscore;
-        int txtX = winWidth / 2;
-        int txtY = winHeights / 2;
+        if (!gameOver) {
+            txtX = 10;
+            txtY = 50;
+        } else {
+            txtX = winWidth / 2 - 125;
+            txtY = winHeights / 2 - 200;
+        }
+        setText(context, txt, 36, txtX, txtY, Color.WHITE);
+    }
 
-        context.fillText(txt, txtX, txtY);
-        context.strokeText(txt, txtX, txtY);
+
+    private void drawDeathScreen(GraphicsContext context) {
+        //setHighscore();
+
+        //DrawHighscore
+        String txt = "High Score: " + highscore;
+        int txtX = winWidth / 2 - 200;
+        int txtY = winHeights / 2 - 125;
+        setText(context, txt, 40, txtX, txtY, Color.WHITE);
+
+        //draw Death screen:
+        setText(context, "GAME OVER!", 75, txtX - 100, txtY + 100, Color.RED);
 
     }
 
