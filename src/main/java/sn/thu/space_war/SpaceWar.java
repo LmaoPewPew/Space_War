@@ -13,6 +13,7 @@ import javafx.scene.text.Font;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 
+import java.io.*;
 import java.util.ArrayList;
 
 public class SpaceWar extends Application {
@@ -54,15 +55,27 @@ public class SpaceWar extends Application {
    */
 
 
-    int asteroidCounter, asteroidSpawnCount = 3;
+    private int asteroidCounter, asteroidSpawnCount = 3;
 
-    boolean isGamePaused = false, gameOver = false;
-    int score = 0;
-    String highscore;
+    private boolean isGamePaused = false, gameOver = false;
+    private int score = 0;
+    private String highscore;
+
+    String filePath = "sn/thu/space_war/highscore.txt";
+    File scoreFile = new File(filePath);
 
 
     @Override
-    public void start(Stage stage) {
+    public void start(Stage stage)/* throws IOException */ {
+
+/**************************************************/
+        /*
+        InputStream is = this.getClass().getResourceAsStream(filePath);
+        BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(is));
+        highscore = bufferedReader.readLine();
+        is.close();
+        */
+/**************************************************/
 
         stage.getIcons().add(new Image("https://i.imgur.com/DkhjfKu.png"));
         stage.setTitle("SpaceWars!");
@@ -140,9 +153,11 @@ public class SpaceWar extends Application {
         };
 ///////////////////////////////////////////////////////////////////
         //end of launch()
+
         gameLoop.start();
         stage.show();
     }
+
 
     /**
      * ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++METHODS STARTING+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -226,7 +241,6 @@ public class SpaceWar extends Application {
     private void playerMov(ArrayList<String> keyPressList, Sprite ship) {
         if (keyPressList.contains("LEFT") || keyPressList.contains("A")) ship.rot -= 1.5;
         if (keyPressList.contains("RIGHT") || keyPressList.contains("D")) ship.rot += 1.5;
-
         if (keyPressList.contains("UP") || keyPressList.contains("W")) {
             ship.vel.setLength(75);
             ship.vel.setAngle(ship.rot);
@@ -278,46 +292,28 @@ public class SpaceWar extends Application {
         }
     }
 
-
-    //TODO: moon collision!
     private void collisionDetection(Sprite ship, ArrayList<Sprite> moonList) {
-
         for (Sprite moon : moonList) {
             if (ship.overlaps(moon)) {
                 gameOver = true;
+
                 ship.vel.setLength(0);
                 moon.vel.setLength(0);
 
                 setHighscore();
-                getEndCart();
+                // getEndCart();
             }
         }
     }
 
-    //TODO
+    //TODO   ###########################################################################################################
     private void setHighscore() {
-        /*
-
-
-        try {
-            File hsFile = new File("sn/thu/space_war/highscore.txt");
-            Scanner myReader = new Scanner(hsFile);
-
-            while (myReader.hasNextLine()) {
-                String data = myReader.nextLine();
-                System.out.println(data);
-            }
-            myReader.close();
-        } catch (FileNotFoundException e) {
-            System.out.println("An error occurred.");
-            e.printStackTrace();
-        }
+        /*********************************************************************/
         /*
         if (score > Integer.parseInt(highscore)) {
             highscore = String.valueOf(score);
-
             try {
-                FileWriter writer = new FileWriter("sn/thu/space_war/highscore.txt", false);
+                FileWriter writer = new FileWriter(filePath, false);
                 BufferedWriter bufferedWriter = new BufferedWriter(writer);
                 bufferedWriter.write(highscore);
                 bufferedWriter.close();
@@ -325,9 +321,82 @@ public class SpaceWar extends Application {
                 e.printStackTrace();
             }
         }
+        */
+        /*********************************************************************/
 
-         */
+        highscore = this.getHighscore();
+
+       /*if (score > Integer.parseInt(highscore)) {
+            highscore = "" + score;
+            saveHighscore();
+        }
+
+        */
     }
+
+    /**/
+    public String getHighscore() {
+        FileReader readFile;
+        BufferedReader reader = null;
+
+        try {
+            //System.out.println("Score: " + score + " HS: " + highscore);
+
+            //readFile = new FileReader(scoreFile);
+            //reader = new BufferedReader(readFile);
+            //return reader.readLine();
+
+            return "" + score;
+        } catch (Exception e) {
+            System.out.println("Get Highscore");
+            return "0";
+        } finally {
+            try {
+                if (reader != null) reader.close();
+            } catch (IOException e) {
+                //e.printStackTrace();
+                System.out.println("GetHS, finally");
+            }
+        }
+    }
+
+    public void saveHighscore() {
+
+//if scoreFile doesn't exist, create new one!
+        if (!scoreFile.exists()) {
+            try {
+                scoreFile.createNewFile();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+
+
+        FileWriter writeFile;
+        BufferedWriter writer = null;
+        try {
+            System.out.println("Score: " + score + " HS: " + highscore);
+
+            writeFile = new FileWriter(scoreFile);
+            writer = new BufferedWriter(writeFile);
+
+
+            writer.write(this.highscore);
+
+        } catch (Exception e) {
+            System.out.println("saceHigh");
+        } finally {
+            try {
+                if (writer != null) writer.close();
+            } catch (Exception e) {
+                //e.printStackTrace();
+
+                System.out.println("saveHS, finally");
+            }
+        }
+    }
+
+    //*/
 
     private void getEndCart() {
     }
@@ -394,7 +463,6 @@ public class SpaceWar extends Application {
 
 
     private void drawDeathScreen(GraphicsContext context) {
-        //setHighscore();
 
         //DrawHighscore
         String txt = "High Score: " + highscore;
