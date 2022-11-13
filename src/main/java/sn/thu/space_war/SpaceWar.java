@@ -112,9 +112,7 @@ public class SpaceWar extends Application {
                     if (i == 1) getEndCard(root, canvas, stage);
                 }
                 if (gamePaused) {
-                    int txtX = winWidth / 2 - 300;
-                    int txtY = winHeights / 2 - 25;
-                    setText(context, "GAME PAUSED!", 75, txtX, txtY, Color.CADETBLUE);
+                    drawPausedScreen(context);
                 }
             }
         };
@@ -279,7 +277,6 @@ public class SpaceWar extends Application {
             reader = new BufferedReader(readFile);
             return reader.readLine();
         } catch (Exception e) {
-            System.out.println("Get Highscore");
             return String.valueOf(score);
         } finally {
             try {
@@ -402,6 +399,18 @@ public class SpaceWar extends Application {
         pane.setCenter(stackPane);
     }
 
+    private void drawPausedScreen(GraphicsContext context) {
+        int txtX = winWidth / 2 - 300;
+        int txtY = winHeights / 2 - 25;
+
+        //DrawHighscore
+        String txt = "High Score: " + highscore;
+        setText(context, txt, 40, txtX, txtY, Color.WHITE);
+
+        //setText(context, "GAME PAUSED!", 75, txtX, txtY, Color.CADETBLUE);
+        setText(context, "GAME OVER!", 75, txtX - 100, txtY + 100, Color.RED);
+
+    }
 
     private VBox btnConfig(VBox vBox, Stage stage, Button rsBtn, Button exBtn) {
         //vBox endCard
