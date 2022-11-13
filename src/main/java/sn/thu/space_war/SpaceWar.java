@@ -245,7 +245,6 @@ public class SpaceWar extends Application {
         }
     }
 
-    //TODO: ALL MOONS SPAWN IN A SINGLE CORNER!!
     private double spawnPadding(double pos, double sPos) {
         // 1 || -1
         final int alt = (int) Math.pow((-1), ((int) (Math.random() * 2) + 1));
