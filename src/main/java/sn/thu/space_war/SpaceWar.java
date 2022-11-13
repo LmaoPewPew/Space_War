@@ -106,15 +106,16 @@ public class SpaceWar extends Application {
                 drawScore(context);
 
                 if (gameOver) {
-                    //DeathScreen
                     drawDeathScreen(context);
                     i++;
                     if (i == 1) getEndCard(root, canvas, stage);
                 }
                 if (gamePaused) {
-                    drawPausedScreen(context);
-                }
+                    drawPausedScreen(context, "GAME PAUSED!");
+
+                } else drawPausedScreen(context, "");
             }
+
         };
         //end of launch()
         gameLoop.start();
@@ -366,7 +367,6 @@ public class SpaceWar extends Application {
         setText(context, txt, 40, txtX, txtY, Color.WHITE);
 
         //draw Death screen:
-
         setText(context, "GAME OVER!", 75, txtX - 100, txtY + 100, Color.RED);
     }
 
@@ -382,9 +382,8 @@ public class SpaceWar extends Application {
     /********************************************MAIN-MENU*************************************************************/
     private void checkMainMenu(ArrayList<String> keyJustPressedList, GraphicsContext context, Stage s, Canvas c, BorderPane p) {
         if (keyJustPressedList.contains("ESCAPE")) {
-            if (!gamePaused) {
-                drawMainMenu(s, c, p);
-            }
+            gamePaused = true;
+            drawMainMenu(s, c, p);
         }
     }
 
@@ -398,17 +397,11 @@ public class SpaceWar extends Application {
         pane.setCenter(stackPane);
     }
 
-    private void drawPausedScreen(GraphicsContext context) {
+    private void drawPausedScreen(GraphicsContext context, String txt) {
         int txtX = winWidth / 2 - 300;
-        int txtY = winHeights / 2 - 25;
+        int txtY = winHeights / 2 - 100;
 
-        //DrawHighscore
-        String txt = "High Score: " + highscore;
-        setText(context, txt, 40, txtX, txtY, Color.WHITE);
-
-        //setText(context, "GAME PAUSED!", 75, txtX, txtY, Color.CADETBLUE);
-        setText(context, "GAME OVER!", 75, txtX - 100, txtY + 100, Color.RED);
-
+        setText(context, txt, 75, txtX, txtY, Color.CADETBLUE);
     }
 
     private VBox btnConfig(VBox vBox, Stage stage, Button rsBtn, Button exBtn) {
@@ -449,6 +442,7 @@ public class SpaceWar extends Application {
         vb.getChildren().remove(rsBtn);
         vb.getChildren().remove(resBtn);
         vb.getChildren().remove(exBtn);
+        gamePaused = false;
     }
 
     private void restartGame(Stage s) {
