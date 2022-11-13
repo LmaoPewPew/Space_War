@@ -81,6 +81,7 @@ public class SpaceWar extends Application {
         //event handler
         score = 0;
         AnimationTimer gameLoop = new AnimationTimer() {
+            int i = 0;
 
             @Override
             public void handle(long now) {
@@ -105,11 +106,15 @@ public class SpaceWar extends Application {
                 drawScore(context);
 
                 if (gameOver) {
-                    gameOver = false;
                     //DeathScreen
                     drawDeathScreen(context);
-                    getEndCard(root, canvas, stage);
-                    System.out.println("gameOver " + gameOver);
+                    i++;
+                    if (i == 1) getEndCard(root, canvas, stage);
+                }
+                if (gamePaused) {
+                    int txtX = winWidth / 2 - 300;
+                    int txtY = winHeights / 2 - 25;
+                    setText(context, "GAME PAUSED!", 75, txtX, txtY, Color.CADETBLUE);
                 }
             }
         };
@@ -374,18 +379,14 @@ public class SpaceWar extends Application {
         Button rsBtn = new Button("Play Again");
         Button exBtn = new Button("Exit Game");
 
-        StackPane stackPane = new StackPane(canvas, vBox(new VBox(), stage, rsBtn, exBtn));
+        StackPane stackPane = new StackPane(canvas, btnConfig(new VBox(), stage, rsBtn, exBtn));
         pane.setCenter(stackPane);
     }
 
     /********************************************MAIN-MENU*************************************************************/
     private void checkMainMenu(ArrayList<String> keyJustPressedList, GraphicsContext context, Stage s, Canvas c, BorderPane p) {
-        int txtX = winWidth / 2 - 300;
-        int txtY = winHeights / 2 - 25;
-
         if (keyJustPressedList.contains("ESCAPE")) {
             if (!gamePaused) {
-                setText(context, "GAME PAUSED!", 75, txtX, txtY, Color.CADETBLUE);
                 drawMainMenu(s, c, p);
             }
         }
@@ -397,12 +398,12 @@ public class SpaceWar extends Application {
         Button resBtn = new Button("Resume");
         Button exBtn = new Button("Exit Game");
 
-        StackPane stackPane = new StackPane(canvas, vBox(new VBox(), stage, rsBtn, resBtn, exBtn));
+        StackPane stackPane = new StackPane(canvas, btnConfig(new VBox(), stage, rsBtn, resBtn, exBtn));
         pane.setCenter(stackPane);
     }
 
 
-    private VBox vBox(VBox vBox, Stage stage, Button rsBtn, Button exBtn) {
+    private VBox btnConfig(VBox vBox, Stage stage, Button rsBtn, Button exBtn) {
         //vBox endCard
         rsBtn.setPrefSize(200, 50);
         exBtn.setPrefSize(200, 50);
@@ -421,7 +422,7 @@ public class SpaceWar extends Application {
         return vBox;
     }
 
-    private VBox vBox(VBox vBox, Stage stage, Button rsBtn, Button resBtn, Button exBtn) {
+    private VBox btnConfig(VBox vBox, Stage stage, Button rsBtn, Button resBtn, Button exBtn) {
         //vBoxMenu
         resBtn.setPrefSize(200, 50);
         resBtn.setFont(new Font("Arial Black", 20));
@@ -430,7 +431,7 @@ public class SpaceWar extends Application {
         resBtn.setOnAction(e -> resumeGame(finalVBox, rsBtn, resBtn, exBtn));
 
         vBox.getChildren().addAll(resBtn);
-        vBox = vBox(vBox, stage, rsBtn, exBtn);
+        vBox = btnConfig(vBox, stage, rsBtn, exBtn);
 
         return vBox;
     }
