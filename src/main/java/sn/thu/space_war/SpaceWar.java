@@ -23,15 +23,15 @@ import java.util.ArrayList;
 
 public class SpaceWar extends Application {
 
-    /** Asteroids are labeled as moons, because I think its funny to use a moon image as an asteroid. moons == asteroids!
-     *  Sprite images couldn't load properly, that's why I'll use an online source via Imgur
-     */
-
-
     /**
-     * TODO:
-     * check High-score with score          | planned next: siehe flappy bird project
-     * endCard::TODO  BUttons not working
+     * SIDENOTES:
+     * Asteroids are labeled as moons, because I think its funny to use a moon image as an asteroid. moons == asteroids!
+     * -------
+     * ERRORS:
+     * Sprite images couldn't load properly, that's why I'll use an online source via Imgur!!
+     * Any kind of path files wouldn't load, making the Highscore functions ineffective!
+     * Death Screen Buttons don't work!
+     * Pause Menu, "Game Paused!" Text doesn't appear
      */
 
     private final int winWidth = 1000, winHeights = 660;
@@ -365,6 +365,7 @@ public class SpaceWar extends Application {
         setText(context, txt, 40, txtX, txtY, Color.WHITE);
 
         //draw Death screen:
+
         setText(context, "GAME OVER!", 75, txtX - 100, txtY + 100, Color.RED);
     }
 
@@ -384,7 +385,7 @@ public class SpaceWar extends Application {
 
         if (keyJustPressedList.contains("ESCAPE")) {
             if (!gamePaused) {
-                setText(context, "PAUSE!", 75, txtX, txtY, Color.LIGHTBLUE);
+                setText(context, "GAME PAUSED!", 75, txtX, txtY, Color.CADETBLUE);
                 drawMainMenu(s, c, p);
             }
         }
