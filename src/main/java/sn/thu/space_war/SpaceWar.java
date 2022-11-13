@@ -438,7 +438,7 @@ public class SpaceWar extends Application {
     }
 
 
-    public static void main(/*String[] args*/) {
+    public static void main(String[] args) {
         try {
             launch();
         } catch (Exception e) {
