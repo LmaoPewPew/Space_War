@@ -2,12 +2,17 @@ package sn.thu.space_war;
 
 import javafx.animation.AnimationTimer;
 import javafx.application.Application;
+import javafx.geometry.Insets;
+import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.control.Button;
 import javafx.scene.image.Image;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.StackPane;
+import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.stage.Stage;
@@ -22,14 +27,6 @@ public class SpaceWar extends Application {
      * Sprite images couldn't load properly, that's why I'll use an online source via Imgur
      */
 
-
-    /**
-     * SOURCES:
-     * https://www.youtube.com/watch?v=N2EmtYGLh4U
-     * https://www.google.com/search?q=javafx+game+main+menu&client=opera&ei=f3pqY8-tL6aCxc8P8-ufqAg&oq=javafx+game+main&gs_lcp=Cgxnd3Mtd2l6LXNlcnAQAxgAMgUIIRCgAToKCAAQRxDWBBCwAzoFCAAQogQ6BQgAEIAEOgYIABAWEB46BAghEBVKBAhBGABKBAhGGABQtRFY5SxgmDZoAXABeACAAZQBiAHgB5IBAzQuNZgBAKABAcgBCMABAQ&sclient=gws-wiz-serp
-     * https://www.google.com/search?q=javafx+objectproperty&client=opera&hs=cnU&ei=zXhqY8GpHfq8xc8PyZ240AU&oq=javaFX+respawn+object&gs_lcp=Cgxnd3Mtd2l6LXNlcnAQARgAMggIABCiBBCwAzIICAAQogQQsANKBAhBGAFKBAhGGABQAFgAYIw1aAFwAHgAgAEAiAEAkgEAmAEAyAECwAEB&sclient=gws-wiz-serp
-     * https://www.baeldung.com/javafx-button-eventhandler
-     */
 
     /**
      * TODO:
@@ -47,17 +44,9 @@ public class SpaceWar extends Application {
 
 
     private final int winWidth = 1000, winHeights = 660;
-
-    /*
-   MainMenu
-    private List<Pair<String, Runnable>> menuData = Arrays.asList(new Pair<String, Runnable>("Resume to Game", () -> {
-   }), new Pair<String, Runnable>("Exit to Desktop", Platform::exit));
-   */
-
-
     private int asteroidCounter, asteroidSpawnCount = 3;
 
-    private boolean isGamePaused = false, gameOver = false;
+    private boolean gamePaused = false, gameOver = false;
     private int score = 0;
     private String highscore;
 
@@ -101,11 +90,12 @@ public class SpaceWar extends Application {
         ArrayList<Sprite> moonList = new ArrayList<>();
 
         isKeyPressed(scene, keyPressList, keyJustPressedList);
-
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         //Generate Sprites
 
         //Space
+
+        //Sprite bg = new Sprite("img/space.jpg");
         Sprite bg = new Sprite("https://i.imgur.com/x2kwpXR.jpg");
         bg.pos.set(winWidth / 2, winHeights / 2);
 
@@ -125,9 +115,8 @@ public class SpaceWar extends Application {
                     //user input
                     playerMov(keyPressList, ship);
                     playerShoot(keyJustPressedList, ship, laserList);
-                    mainMenu(keyJustPressedList);
+                    checkMainMenu(keyJustPressedList, stage, canvas, root);
                 }
-
 
                 //difficulty change:
                 if (score == 200) asteroidSpawnCount = 5;
@@ -147,8 +136,11 @@ public class SpaceWar extends Application {
 
                 drawScore(context);
                 if (gameOver) {
+                    //DeathScreen
                     drawDeathScreen(context);
+                    getEndCard(root, canvas, stage);
                 }
+
             }
         };
 ///////////////////////////////////////////////////////////////////
@@ -195,7 +187,7 @@ public class SpaceWar extends Application {
         double x = winWidth * Math.random();
         double y = winHeights * Math.random();
 
-        moon.pos.set(spawnBubble(x, shipX), spawnBubble(y, shipY));
+        moon.pos.set(spawnPadding(x, shipX), spawnPadding(y, shipY));
 
         //moon.pos.set(x, y);
 
@@ -211,16 +203,17 @@ public class SpaceWar extends Application {
 
 
     //TODO: ALL MOONS SPAWN IN A SINGLE CORNER!!
-    private double spawnBubble(double pos, double sPos) {
+    private double spawnPadding(double pos, double sPos) {
 
         final int pow = (int) (Math.random() * 2) + 1;
         final int alt = (int) Math.pow((-1), pow);
+        // 1 || -1
 
-        if (sPos + 50 >= pos || sPos - 50 <= pos) pos += sPos * alt;
+        if (sPos + 100 >= pos || sPos - 100 <= pos) pos += sPos * alt;
 
         //out of bounds spawn
-        if (pos <= 0) pos = winWidth - 100;
-        if (pos >= winWidth) pos = 100;
+        if (pos <= 0) pos = winWidth - 300;
+        if (pos >= winWidth) pos = 300;
 
         return pos;
     }
@@ -259,22 +252,53 @@ public class SpaceWar extends Application {
         }
     }
 
-    private void mainMenu(ArrayList<String> keyJustPressedList) {
+    private void checkMainMenu(ArrayList<String> keyJustPressedList, Stage s, Canvas c, BorderPane p) {
+
         if (keyJustPressedList.contains("ESCAPE")) {
-            if (!isGamePaused) {
-                addTitle();
-
-                System.out.println("is the game paused? " + isGamePaused);
-
-                isGamePaused = true;
-            } else {
+            if (!gamePaused) {
 
 
-                isGamePaused = false;
+                mainMenu();
+                //drawMainMenu(s, c, p);
+
+                gamePaused = true;
+            } /*else {
+
+                gamePaused = false;
             }
+            */
         }
     }
 
+    private void mainMenu() {
+
+    }
+
+    private void drawMainMenu(Stage stage, Canvas canvas, BorderPane pane) {
+
+        //respawn / exit
+        Button rsBtn = new Button("Play Again");
+        Button exBtn = new Button("Exit Game");
+
+        rsBtn.setPrefSize(200, 50);
+        exBtn.setPrefSize(200, 50);
+
+        rsBtn.setFont(new Font("Arial Black", 20));
+        exBtn.setFont(new Font("Arial Black", 20));
+
+
+        rsBtn.setOnAction(e -> launch());
+        exBtn.setOnAction(e -> stage.close());
+
+        VBox vBox = new VBox(rsBtn, exBtn);
+        vBox.setAlignment(Pos.CENTER_RIGHT);
+        vBox.setPadding(new Insets(200, winWidth / 2 - 67, 100, 0));
+
+
+        StackPane stackPane = new StackPane(canvas, vBox);
+
+        pane.setCenter(stackPane);
+    }
 
     //if moon == hit from laser => BOOM
     private void moonHit(ArrayList<Sprite> laserList, ArrayList<Sprite> moonList) {
@@ -301,7 +325,6 @@ public class SpaceWar extends Application {
                 moon.vel.setLength(0);
 
                 setHighscore();
-                // getEndCart();
             }
         }
     }
@@ -326,12 +349,12 @@ public class SpaceWar extends Application {
 
         highscore = this.getHighscore();
 
-       /*if (score > Integer.parseInt(highscore)) {
+  /*     if (score > Integer.parseInt(highscore)) {
             highscore = "" + score;
             saveHighscore();
         }
+*/
 
-        */
     }
 
     /**/
@@ -342,14 +365,15 @@ public class SpaceWar extends Application {
         try {
             //System.out.println("Score: " + score + " HS: " + highscore);
 
-            //readFile = new FileReader(scoreFile);
-            //reader = new BufferedReader(readFile);
-            //return reader.readLine();
+            readFile = new FileReader(scoreFile);
+            reader = new BufferedReader(readFile);
 
-            return "" + score;
+            return reader.readLine();
+
+            //return "" + score;
         } catch (Exception e) {
-            System.out.println("Get Highscore");
-            return "0";
+            // System.out.println("Get Highscore");
+            return "" + score;
         } finally {
             try {
                 if (reader != null) reader.close();
@@ -384,7 +408,7 @@ public class SpaceWar extends Application {
             writer.write(this.highscore);
 
         } catch (Exception e) {
-            System.out.println("saceHigh");
+            System.out.println("saveHigh");
         } finally {
             try {
                 if (writer != null) writer.close();
@@ -395,12 +419,7 @@ public class SpaceWar extends Application {
             }
         }
     }
-
     //*/
-
-    private void getEndCart() {
-    }
-
 
     private void updateGraphics(Sprite ship, ArrayList<Sprite> laserList, ArrayList<Sprite> moonList) {
         double deltaTime = 1 / 60.0;
@@ -461,9 +480,7 @@ public class SpaceWar extends Application {
         setText(context, txt, 36, txtX, txtY, Color.WHITE);
     }
 
-
     private void drawDeathScreen(GraphicsContext context) {
-
         //DrawHighscore
         String txt = "High Score: " + highscore;
         int txtX = winWidth / 2 - 200;
@@ -472,13 +489,31 @@ public class SpaceWar extends Application {
 
         //draw Death screen:
         setText(context, "GAME OVER!", 75, txtX - 100, txtY + 100, Color.RED);
-
     }
 
-    private void addTitle() {
-        SpaceWarsTitle swTitle = new SpaceWarsTitle("SpaceWars");
-        swTitle.setTranslateX(winWidth / 2 - swTitle.getTitleWidth() / 2);
-        swTitle.setTranslateY(winHeights / 2);
+    private void getEndCard(BorderPane pane, Canvas canvas, Stage stage) {
+        //respawn / exit
+        Button rsBtn = new Button("Play Again");
+        Button exBtn = new Button("Exit Game");
+
+        rsBtn.setPrefSize(200, 50);
+        exBtn.setPrefSize(200, 50);
+
+        rsBtn.setFont(new Font("Arial Black", 20));
+        exBtn.setFont(new Font("Arial Black", 20));
+
+
+        rsBtn.setOnAction(e -> launch());
+        exBtn.setOnAction(e -> stage.close());
+
+        VBox vBox = new VBox(rsBtn, exBtn);
+        vBox.setAlignment(Pos.CENTER_RIGHT);
+        vBox.setPadding(new Insets(200, winWidth / 2 - 67, 100, 0));
+
+
+        StackPane stackPane = new StackPane(canvas, vBox);
+
+        pane.setCenter(stackPane);
     }
 
     /**
