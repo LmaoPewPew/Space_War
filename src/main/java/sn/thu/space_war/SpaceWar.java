@@ -8,7 +8,6 @@ import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.Button;
-import javafx.scene.image.Image;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.StackPane;
@@ -34,11 +33,10 @@ public class SpaceWar extends Application {
     private boolean gamePaused = false, gameOver = false;
     private int score = 0;
     private String highscore;
-    File scoreFile = new File("sn/thu/space_war/highscore.txt");
+    private final File scoreFile = new File("D:\\Code\\java\\school\\CompGraph\\Space_War\\src\\main\\java\\sn\\thu\\space_war\\highscore.txt");
 
     @Override
     public void start(Stage stage) {
-        stage.getIcons().add(new Image("https://i.imgur.com/DkhjfKu.png"));
         stage.setTitle("SpaceWars!");
 
         BorderPane root = new BorderPane();
@@ -61,12 +59,15 @@ public class SpaceWar extends Application {
 
         isKeyPressed(scene, keyPressList, keyJustPressedList);
 
-        //Normal file-path does NOT work! I DON'T KNOW WHY????? Online URL is the best working solution!
-        //Sprite bg = new Sprite("img/space.jpg");
+        createHSFile();
+
+        //Sprite bg = new Sprite("D:\\Code\\java\\school\\CompGraph\\Space_War\\src\\main\\java\\sn\\thu\\space_war\\img\\space.jpg");
         Sprite bg = new Sprite("https://i.imgur.com/x2kwpXR.jpg");
         bg.pos.set(winWidth / 2, winHeights / 2);
 
         //Ship
+
+        //Sprite ship = new Sprite("D:\\Code\\java\\school\\CompGraph\\Space_War\\src\\main\\java\\sn\\thu\\space_war\\img\\rocket.png");
         Sprite ship = new Sprite("https://i.imgur.com/eKHaPbT.png");
         ship.pos.set(winWidth / 2, winHeights / 2);
 
@@ -130,6 +131,20 @@ public class SpaceWar extends Application {
         }
     }
 
+    private void renderGraphics(GraphicsContext context, Sprite bg, Sprite ship, ArrayList<Sprite> laserList, ArrayList<Sprite> asteroidList) {
+        bg.render(context);
+        ship.render(context);
+        for (Sprite laser : laserList) {
+            laser.render(context);
+        }
+        for (Sprite ast : asteroidList) {
+            ast.render(context);
+        }
+        for (Sprite laser : laserList) {
+            laser.render(context);
+        }
+    }
+
     /**********************************************PLAYER**************************************************************/
     private void isKeyPressed(Scene scene, ArrayList<String> keyPressList, ArrayList<String> keyJustPressedList) {
         //isKeyPressed
@@ -165,6 +180,7 @@ public class SpaceWar extends Application {
     private void playerShoot(ArrayList<String> keyJustPressedList, Sprite ship, ArrayList<Sprite> laserList) {
         if (keyJustPressedList.contains("SPACE")) {
             Sprite laser = new Sprite("https://i.imgur.com/WgY7t46.png");
+            //Sprite laser = new Sprite("D:\\Code\\java\\school\\CompGraph\\Space_War\\src\\main\\java\\sn\\thu\\space_war\\img\\laser.png");
             laser.pos.set(ship.pos.x, ship.pos.y);
             laser.vel.setLength(400);
             laser.vel.setAngle(ship.rot);
@@ -188,6 +204,7 @@ public class SpaceWar extends Application {
 
         if (asteroidCounter <= asteroidSpawnCount) asteroidCounter++;
         Sprite asteroid = new Sprite("https://i.imgur.com/M8SOU8I.png");
+        //Sprite asteroid = new Sprite("D:\\Code\\java\\school\\CompGraph\\Space_War\\src\\main\\java\\sn\\thu\\space_war\\img\\asteroid.png");
 
         // asteroid position
         double x = winWidth * Math.random();
@@ -247,23 +264,29 @@ public class SpaceWar extends Application {
     }
 
     /*******************************************HIGHSCORE**************************************************************/
-    //TODO   ###########################################################################################################
     private void setHighscore() {
-        highscore = this.getHighscore();
-        if (score > Integer.parseInt(highscore)) {
+        if (isNumeric(highscore)) {
+            highscore = this.getHighscore();
+
+            if (score > Integer.parseInt(highscore)) {
+                highscore = "" + score;
+                saveHighscore(this.highscore);
+            }
+        } else {
             highscore = "" + score;
-            saveHighscore();
+            saveHighscore(this.highscore);
         }
     }
 
-    public String getHighscore() {
+    private String getHighscore() {
         FileReader readFile;
         BufferedReader reader = null;
 
         try {
             readFile = new FileReader(scoreFile);
             reader = new BufferedReader(readFile);
-            return reader.readLine();
+            if (reader.readLine() == null) return "0";
+            else return reader.readLine();
         } catch (Exception e) {
             return String.valueOf(score);
         } finally {
@@ -271,42 +294,43 @@ public class SpaceWar extends Application {
                 if (reader != null) reader.close();
             } catch (IOException e) {
                 //e.printStackTrace();
-                System.out.println("GetHS, finally");
             }
         }
     }
 
-    public void saveHighscore() {
+    private void saveHighscore(String score) {
+        try {
+            FileWriter writeFile = new FileWriter(scoreFile);
+            BufferedWriter writer = new BufferedWriter(writeFile);
+            writer.write(score);
+            writer.close();
+        } catch (Exception e) {
+            //e.printStackTrace();
+        }
+    }
+
+    private void createHSFile() {
 //if scoreFile doesn't exist, create new one!
         if (!scoreFile.exists()) {
             try {
                 scoreFile.createNewFile();
+                saveHighscore("0");
             } catch (IOException e) {
-                e.printStackTrace();
+                //e.printStackTrace();
             }
-        }
-        try {
-            FileWriter writeFile = new FileWriter(scoreFile);
-            BufferedWriter writer = new BufferedWriter(writeFile);
-            writer.write(this.highscore);
-            writer.close();
-        } catch (Exception e) {
-            System.out.println("saveHigh");
         }
     }
 
-    private void renderGraphics(GraphicsContext context, Sprite bg, Sprite ship, ArrayList<Sprite> laserList, ArrayList<Sprite> asteroidList) {
-        bg.render(context);
-        ship.render(context);
-        for (Sprite laser : laserList) {
-            laser.render(context);
+    public boolean isNumeric(String strNum) {
+        if (strNum == null) {
+            return false;
         }
-        for (Sprite ast : asteroidList) {
-            ast.render(context);
+        try {
+            int i = Integer.parseInt(strNum);
+        } catch (NumberFormatException nfe) {
+            return false;
         }
-        for (Sprite laser : laserList) {
-            laser.render(context);
-        }
+        return true;
     }
 
     /**********************************************SCORE***************************************************************/
