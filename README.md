@@ -19,7 +19,7 @@ Are you ready to explore the space and survive this long journey without any pro
 
 ### Installation
 
-1. Clone the repo
+1. Clone the repo or Download: [here](https://github.com/LmaoPewPew/Space_War/releases)
 
    ```sh
    git clone https://github.com/LmaoPewPew/Space_War.git
@@ -30,8 +30,6 @@ Are you ready to explore the space and survive this long journey without any pro
    ```sh
    java -jar .\Space_War.jar
    ```
-
-> Download: [here](https://github.com/LmaoPewPew/Space_War/releases)
 
 [stars-shield]: https://img.shields.io/github/stars/LmaoPewPew/Space_War.svg
 [stars-url]: https://github.com/LmaoPewPew/Space_War/stargazers
