@@ -23,9 +23,10 @@ import java.util.ArrayList;
 public class SpaceWar extends Application {
 
     /**
-     * ERRORS-NOTES:
-     * Sprite images couldn't load properly, that's why I'll use an online source via Imgur!!
-     * Any kind of path files wouldn't load, making the Highscore functions ineffective!
+     * SIDE-NOTES:
+     * normal path doesn't work, only Absolut path works, which is bad!
+     * that's why I'll use an online source to load the Sprites via Imgur!! (Obviously needs a working Internet-Connection)
+     * I didn't find an online alternative as a text editor, to save the Highscore, that's why I'll use my absolute path.
      */
 
     private final int winWidth = 1000, winHeights = 660;
@@ -44,7 +45,6 @@ public class SpaceWar extends Application {
         Scene scene = new Scene(root);
         stage.setScene(scene);
         stage.setResizable(false);
-        //stage.initStyle(StageStyle.UTILITY);
 
         Canvas canvas = new Canvas(winWidth, winHeights);
         GraphicsContext context = canvas.getGraphicsContext2D();
@@ -322,7 +322,7 @@ public class SpaceWar extends Application {
             return false;
         }
         try {
-            System.out.println("numericCheck: True" );
+            System.out.println("numericCheck: True");
             int i = Integer.parseInt(strNum);
         } catch (NumberFormatException nfe) {
             return false;
@@ -460,7 +460,6 @@ public class SpaceWar extends Application {
 
 
     public static void main(String[] args) {
-
         try {
             launch();
         } catch (Exception e) {
