@@ -8,6 +8,7 @@ import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.Button;
+import javafx.scene.image.Image;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.StackPane;
@@ -15,7 +16,6 @@ import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.stage.Stage;
-import javafx.stage.StageStyle;
 
 import java.io.*;
 import java.util.ArrayList;
@@ -32,18 +32,19 @@ public class SpaceWar extends Application {
     private int asteroidCounter, asteroidSpawnCount = 3;
     private boolean gamePaused = false, gameOver = false;
     private int score = 0;
-    private String highscore;
+    private String highscore = "0";
     private final File scoreFile = new File("D:\\Code\\java\\school\\CompGraph\\Space_War\\src\\main\\java\\sn\\thu\\space_war\\highscore.txt");
 
     @Override
     public void start(Stage stage) {
+        stage.getIcons().add(new Image("https://i.imgur.com/DkhjfKu.png"));
         stage.setTitle("SpaceWars!");
 
         BorderPane root = new BorderPane();
         Scene scene = new Scene(root);
         stage.setScene(scene);
         stage.setResizable(false);
-        stage.initStyle(StageStyle.UTILITY);
+        //stage.initStyle(StageStyle.UTILITY);
 
         Canvas canvas = new Canvas(winWidth, winHeights);
         GraphicsContext context = canvas.getGraphicsContext2D();
@@ -65,8 +66,6 @@ public class SpaceWar extends Application {
         Sprite bg = new Sprite("https://i.imgur.com/x2kwpXR.jpg");
         bg.pos.set(winWidth / 2, winHeights / 2);
 
-        //Ship
-
         //Sprite ship = new Sprite("D:\\Code\\java\\school\\CompGraph\\Space_War\\src\\main\\java\\sn\\thu\\space_war\\img\\rocket.png");
         Sprite ship = new Sprite("https://i.imgur.com/eKHaPbT.png");
         ship.pos.set(winWidth / 2, winHeights / 2);
@@ -83,13 +82,14 @@ public class SpaceWar extends Application {
                     checkMainMenu(keyJustPressedList, context, stage, canvas, root);
                 }
 
+                if (gamePaused) drawPauseScreen(context);
+
                 gameDifficulty();
                 if (asteroidCounter <= asteroidSpawnCount) spawnAsteroids(ship, asteroidList);
 
                 keyJustPressedList.clear();
 
                 hitAsteroid(laserList, asteroidList);
-                collisionDetection(ship, asteroidList);
 
                 updateGraphics(ship, laserList, asteroidList);
                 renderGraphics(context, bg, ship, laserList, asteroidList);
@@ -100,10 +100,7 @@ public class SpaceWar extends Application {
                     drawDeathScreen(context);
                     i++;
                     if (i == 1) getEndCard(root, canvas, stage);
-                }
-                if (gamePaused) {
-                    drawPauseScreen(context);
-                }
+                } else collisionDetection(ship, asteroidList);
             }
         };
         //end of launch()
@@ -211,10 +208,13 @@ public class SpaceWar extends Application {
         double y = winHeights * Math.random();
 
         asteroid.pos.set(spawnPadding(x, shipX), spawnPadding(y, shipY));
+        //asteroid.pos.set(x, y);
 
         //movement
         double angle = 360 * Math.random();
-        double v = asteroidsSpeed();
+        double v = asteroidsSpeed(), temp = v;
+
+        v = (gamePaused) ? 0 : temp;
 
         asteroid.vel.setLength(v);
         asteroid.vel.setAngle(angle);
@@ -223,16 +223,15 @@ public class SpaceWar extends Application {
     }
 
     private double asteroidsSpeed() {
-        if (gamePaused) return 0;
         //changes asteroids spawn rate and asteroids speed;
-        double speed = 20 * Math.random() + 5;
-        if (score >= 200) speed = 40 * Math.random() + speed;
-        if (score >= 500) speed = 80 * Math.random() + speed;
-        if (score >= 1000) speed = 100 * Math.random() + speed;
+        double astSpeed = 20 * Math.random() + 5;
+        if (score >= 200) astSpeed = 40 * Math.random() + astSpeed;
+        if (score >= 500) astSpeed = 80 * Math.random() + astSpeed;
+        if (score >= 1000) astSpeed = 100 * Math.random() + astSpeed;
 
-        speed = Math.floor(speed);
+        astSpeed = Math.floor(astSpeed);
 
-        return speed;
+        return astSpeed;
     }
 
     private void hitAsteroid(ArrayList<Sprite> laserList, ArrayList<Sprite> asteroidList) {
@@ -252,80 +251,78 @@ public class SpaceWar extends Application {
     }
 
     private double spawnPadding(double pos, double sPos) {
-        // 1 || -1
-        final int alt = (int) Math.pow((-1), ((int) (Math.random() * 2) + 1));
-
-        if (sPos + 100 >= pos || sPos - 100 <= pos) pos = (sPos * 0.5) * alt;
-        //out of bounds spawn
-        if (pos <= 0) pos = (winWidth - 300) - (winHeights - 300);
-        if (pos >= winWidth || pos >= winHeights) pos = 300;
-
+        int padding = 75;
+        if (sPos + padding >= pos && sPos - padding <= pos) pos += sPos / 2;
         return pos;
     }
 
     /*******************************************HIGHSCORE**************************************************************/
     private void setHighscore() {
+        highscore = this.getHighscore();
         if (isNumeric(highscore)) {
-            highscore = this.getHighscore();
-
             if (score > Integer.parseInt(highscore)) {
+                System.out.println(score + ">" + highscore);
                 highscore = "" + score;
                 saveHighscore(this.highscore);
             }
-        } else {
-            highscore = "" + score;
-            saveHighscore(this.highscore);
         }
     }
 
     private String getHighscore() {
         FileReader readFile;
         BufferedReader reader = null;
-
         try {
             readFile = new FileReader(scoreFile);
             reader = new BufferedReader(readFile);
-            if (reader.readLine() == null) return "0";
-            else return reader.readLine();
+            System.out.println("get " + score);
+            return reader.readLine();
         } catch (Exception e) {
-            return String.valueOf(score);
+            return "ERROR!\nscore: " + score;
         } finally {
             try {
-                if (reader != null) reader.close();
+                //if (reader != null)
+                reader.close();
             } catch (IOException e) {
-                //e.printStackTrace();
+                e.printStackTrace();
             }
         }
     }
 
-    private void saveHighscore(String score) {
+    //WORKS JUST FINE
+    private void saveHighscore(String hs) {
         try {
             FileWriter writeFile = new FileWriter(scoreFile);
             BufferedWriter writer = new BufferedWriter(writeFile);
-            writer.write(score);
+            System.out.println("save" + hs);
+            writer.write(hs);
             writer.close();
         } catch (Exception e) {
+            System.out.println("saveError");
             //e.printStackTrace();
         }
     }
 
+    //WORKS JUST FINE
     private void createHSFile() {
 //if scoreFile doesn't exist, create new one!
         if (!scoreFile.exists()) {
             try {
                 scoreFile.createNewFile();
-                saveHighscore("0");
+                saveHighscore(score + "");
             } catch (IOException e) {
                 //e.printStackTrace();
             }
         }
     }
 
+    //
     public boolean isNumeric(String strNum) {
         if (strNum == null) {
+            System.out.println("NULL-SCORE");
             return false;
         }
         try {
+            System.out.println("numericCheck: True" );
             int i = Integer.parseInt(strNum);
         } catch (NumberFormatException nfe) {
             return false;
@@ -463,6 +460,7 @@ public class SpaceWar extends Application {
 
 
     public static void main(String[] args) {
+
         try {
             launch();
         } catch (Exception e) {
