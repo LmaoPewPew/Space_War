@@ -2,7 +2,6 @@ package sn.thu.space_war;
 
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.image.Image;
-
 public class Sprite {
     public Vector pos;
     public Vector vel; //velocity
