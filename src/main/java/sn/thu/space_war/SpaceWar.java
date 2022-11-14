@@ -18,6 +18,7 @@ import javafx.scene.text.Font;
 import javafx.stage.Stage;
 
 import java.io.*;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 
 public class SpaceWar extends Application {
@@ -34,7 +35,8 @@ public class SpaceWar extends Application {
     private boolean gamePaused = false, gameOver = false;
     private int score = 0;
     private String highscore = "0";
-    private final File scoreFile = new File("D:\\Code\\java\\school\\CompGraph\\Space_War\\src\\main\\java\\sn\\thu\\space_war\\highscore.txt");
+    private final File scoreFile = new File(Paths.get("highscore.txt").toAbsolutePath().toFile().toURI());
+
 
     @Override
     public void start(Stage stage) {
@@ -62,11 +64,9 @@ public class SpaceWar extends Application {
 
         createHSFile();
 
-        //Sprite bg = new Sprite("D:\\Code\\java\\school\\CompGraph\\Space_War\\src\\main\\java\\sn\\thu\\space_war\\img\\space.jpg");
         Sprite bg = new Sprite("https://i.imgur.com/x2kwpXR.jpg");
         bg.pos.set(winWidth / 2, winHeights / 2);
 
-        //Sprite ship = new Sprite("D:\\Code\\java\\school\\CompGraph\\Space_War\\src\\main\\java\\sn\\thu\\space_war\\img\\rocket.png");
         Sprite ship = new Sprite("https://i.imgur.com/eKHaPbT.png");
         ship.pos.set(winWidth / 2, winHeights / 2);
 
@@ -177,7 +177,7 @@ public class SpaceWar extends Application {
     private void playerShoot(ArrayList<String> keyJustPressedList, Sprite ship, ArrayList<Sprite> laserList) {
         if (keyJustPressedList.contains("SPACE")) {
             Sprite laser = new Sprite("https://i.imgur.com/WgY7t46.png");
-            //Sprite laser = new Sprite("D:\\Code\\java\\school\\CompGraph\\Space_War\\src\\main\\java\\sn\\thu\\space_war\\img\\laser.png");
+
             laser.pos.set(ship.pos.x, ship.pos.y);
             laser.vel.setLength(400);
             laser.vel.setAngle(ship.rot);
@@ -201,7 +201,6 @@ public class SpaceWar extends Application {
 
         if (asteroidCounter <= asteroidSpawnCount) asteroidCounter++;
         Sprite asteroid = new Sprite("https://i.imgur.com/M8SOU8I.png");
-        //Sprite asteroid = new Sprite("D:\\Code\\java\\school\\CompGraph\\Space_War\\src\\main\\java\\sn\\thu\\space_war\\img\\asteroid.png");
 
         // asteroid position
         double x = winWidth * Math.random();
@@ -460,6 +459,7 @@ public class SpaceWar extends Application {
 
 
     public static void main(String[] args) {
+
         try {
             launch();
         } catch (Exception e) {
