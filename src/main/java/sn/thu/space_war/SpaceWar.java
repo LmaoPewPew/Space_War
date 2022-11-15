@@ -18,6 +18,7 @@ import javafx.scene.text.Font;
 import javafx.stage.Stage;
 
 import java.io.*;
+import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 
@@ -35,7 +36,7 @@ public class SpaceWar extends Application {
     private boolean gamePaused = false, gameOver = false;
     private int score = 0;
     private String highscore = "0";
-    private final File scoreFile = new File(Paths.get("highscore.txt").toAbsolutePath().toFile().toURI());
+    private final File scoreFile = new File(Paths.get("GameFolder/highscore.txt").toAbsolutePath().toFile().toURI());
 
 
     @Override
@@ -260,7 +261,6 @@ public class SpaceWar extends Application {
         highscore = this.getHighscore();
         if (isNumeric(highscore)) {
             if (score > Integer.parseInt(highscore)) {
-                System.out.println(score + ">" + highscore);
                 highscore = "" + score;
                 saveHighscore(this.highscore);
             }
@@ -273,7 +273,6 @@ public class SpaceWar extends Application {
         try {
             readFile = new FileReader(scoreFile);
             reader = new BufferedReader(readFile);
-            System.out.println("get " + score);
             return reader.readLine();
         } catch (Exception e) {
             return "ERROR!\nscore: " + score;
@@ -287,12 +286,10 @@ public class SpaceWar extends Application {
         }
     }
 
-    //WORKS JUST FINE
     private void saveHighscore(String hs) {
         try {
             FileWriter writeFile = new FileWriter(scoreFile);
             BufferedWriter writer = new BufferedWriter(writeFile);
-            System.out.println("save" + hs);
             writer.write(hs);
             writer.close();
         } catch (Exception e) {
@@ -301,11 +298,11 @@ public class SpaceWar extends Application {
         }
     }
 
-    //WORKS JUST FINE
     private void createHSFile() {
 //if scoreFile doesn't exist, create new one!
         if (!scoreFile.exists()) {
             try {
+                Files.createDirectories(Paths.get("GameFolder"));
                 scoreFile.createNewFile();
                 saveHighscore(score + "");
             } catch (IOException e) {
@@ -321,7 +318,6 @@ public class SpaceWar extends Application {
             return false;
         }
         try {
-            System.out.println("numericCheck: True");
             int i = Integer.parseInt(strNum);
         } catch (NumberFormatException nfe) {
             return false;
@@ -453,8 +449,16 @@ public class SpaceWar extends Application {
     }
 
     private void restartGame(Stage s) {
-        System.out.println("Restart");
-        s.close();
+        /*
+        final String batFile = new String(String.valueOf(Paths.get("StartUp.exe").toAbsolutePath()));
+        try {
+            Runtime.
+                    getRuntime().exec("build.bat", null, new File(batFile));
+            s.close();
+        } catch (IOException e) {
+        }
+         */
+        System.out.println("Game Couldn't Restart\nRestart Feature isn't implemented yet");
     }
 
 
