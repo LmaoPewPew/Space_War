@@ -25,11 +25,8 @@ Are you ready to explore the space and survive this long journey without any pro
    git clone https://github.com/LmaoPewPew/Space_War.git
    ```
 
-2. Open the folder in your Terminal and type
+2. Open the `StartUp.bat` File.
 
-   ```sh
-   java -jar .\Space_War.jar
-   ```
 
 [stars-shield]: https://img.shields.io/github/stars/LmaoPewPew/Space_War.svg
 [stars-url]: https://github.com/LmaoPewPew/Space_War/stargazers
